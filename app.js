@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
-const tasks = require("./routes/taskRoutes");
+const boards = require("./routes/boardsRoute");
 const bodyParser = require("body-parser");
 const connectDB = require("./db/connect");
-const notFound = require("./middleware/notFoundErr");
+const errorHandlerMiddleWare = require("./middleware/errorHandler");
+const authRouter = require("./routes/auth");
+const authentication = require("./middleware/authentication");
 
 require("dotenv").config();
 
@@ -13,17 +15,12 @@ app.use([
   bodyParser.json(),
 ]);
 
-app.use("/api/v1/tasks", tasks);
+app.use("/api/v1/boards", authentication, boards);
+app.use("/auth", authRouter);
 
-app.use(notFoundErr);
+app.use(errorHandlerMiddleWare);
 
-const port = 3000;
-
-// app.get("/api/v1/tasks")        - get all the tasks
-// app.post("/api/v1/tasks")       - create a new task
-// app.get("/api/v1/tasks/:id")    - get a single task
-// app.patch("/api/v1/tasks/:id")  - update task
-// app.delete("/api/v1/tasks/:id") - delete task
+const port = process.env.PORT || 3000;
 
 const start = async () => {
   try {
