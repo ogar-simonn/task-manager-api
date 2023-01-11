@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
-const boards = require("./routes/boardsRoute");
+const boardRouter = require("./routes/boardsRoute");
+const tasksRouter = require("./routes/taskRoute");
 const bodyParser = require("body-parser");
 const connectDB = require("./db/connect");
 const errorHandlerMiddleWare = require("./middleware/errorHandler");
@@ -15,12 +16,13 @@ app.use([
   bodyParser.json(),
 ]);
 
-app.use("/api/v1/boards", authentication, boards);
+app.use("/api/v1/boards", authentication, boardRouter);
+app.use("/api/v1/tasks", authentication, tasksRouter);
 app.use("/auth", authRouter);
 
 app.use(errorHandlerMiddleWare);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 6000;
 
 const start = async () => {
   try {

@@ -1,18 +1,25 @@
 const jwt = require("jsonwebtoken");
+const { StatusCodes } = require("http-status-codes");
 
-const auth = (req, res, next) => {
+const auth = async (req, res, next) => {
   const authToken = req.headers.authorization;
-  // console.log(authToken);
+
   if (!authToken || !authToken.startsWith("Bearer ")) {
-    return res.status(401).json("Invalid athentication");
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ msg: "Authentication Invalid" });
   }
   const token = authToken.split(" ")[1];
 
   try {
-    const payload = jwt.verify(token);
-    console.log(payload);
-    req.user = { userId: payload.userId, name: payload.name };
-    next();
+    jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
+      if (err) {
+        console.log(err);
+      }
+      req.user = { userId: decoded.userId, name: decoded.name };
+
+      next();
+    });
   } catch (error) {
     throw new UnauthenticatedError("Authentication invalid");
   }

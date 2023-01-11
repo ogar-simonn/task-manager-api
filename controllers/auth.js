@@ -1,30 +1,49 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { StatusCodes } = require("http-status-codes");
+const {
+  CreateCustomError,
+  createCustomError,
+} = require("../errors/custom-error");
 const login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.json({ message: "please provide values" });
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ message: "please provide values" });
   }
-  const user = User.findOne({ email });
+  const user = await User.findOne({ email });
   if (!user) {
-    return res.json({ message: "invalid credentials" });
+    return res
+      .status(StatusCodes.NOT_FOUND)
+      .json({ message: "User Not found" });
   }
+
   bcrypt.compare(password, user.password, function (err, result) {
     if (err) {
-      // handle error
+      console.log(err);
+      res.send("Error");
     }
-    if (res) {
-      // Send JWT
-      const token = createJWT();
-
-      return res.status(200).json({ user: user.name, token });
+    if (result) {
+      jwt.sign(
+        { name: user.name, userId: user._id },
+        process.env.JWT_SECRET,
+        function (err, token) {
+          if (err) {
+            createCustomError(
+              "There was an error validating this user",
+              StatusCodes.BAD_REQUEST
+            );
+          }
+          return res.status(200).json({ name: user.name, token: token });
+        }
+      );
     } else {
-      return res.json({
-        success: false,
-        message: "passwords do not match",
-      });
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ msg: "Password does not match" });
     }
   });
 };
@@ -35,15 +54,19 @@ const register = async (req, res) => {
     res.send("Please provide values");
   }
   const user = await User.create({ name, email, password });
-  // const token = user.createJWT();
-  res.status(201).json({ user: user.name, token: token });
-};
-const createJWT = function () {
-  return jwt.sign(
-    { userId: User._userId, name: User.name },
-    {
-      expiresIn: "30d",
+  jwt.sign(
+    { name: user.name, userId: user._id },
+    process.env.JWT_SECRET,
+    function (err, token) {
+      if (err) {
+        createCustomError(
+          "There was an error validating this user",
+          StatusCodes.BAD_REQUEST
+        );
+      }
+      res.status(200).json({ name: user.name, token: token });
     }
   );
 };
+
 module.exports = { login, register };

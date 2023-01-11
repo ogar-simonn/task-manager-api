@@ -1,25 +1,24 @@
-const Board = require("../models/Board");
+const { Board } = require("../models/Board");
 const asyncWrapper = require("../middleware/async");
-const { createCustomError } = require("../errors/custom-error");
 const { StatusCodes } = require("http-status-codes");
 
 const getBoards = asyncWrapper(async (req, res, next) => {
   const { userId } = req.user;
   const boards = await Board.find({ createdBy: userId }).sort("createdAt");
-  res.status(StatusCodes.OK).json({ boards, count: boards.length });
+  res.status(StatusCodes.OK).json({ boards: boards, count: boards.length });
 });
 
 const createBoard = asyncWrapper(async (req, res) => {
   req.body.createdBy = req.user.userId;
-  // console.log(req.user);
+
   const board = await Board.create(req.body);
   res.status(StatusCodes.CREATED).json(board);
 });
 
 const getSingleBoard = asyncWrapper(async (req, res) => {
-  const jobId = req.params.id;
+  const boardId = req.params.id;
   const { userId } = req.user;
-  const board = Board.findOne({ createdBy: userId, _id: jobId });
+  const board = Board.findOne({ createdBy: userId, _id: boardId });
   if (!board) {
     return res.status(404).json({ message: "no job found" });
   }

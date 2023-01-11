@@ -1,4 +1,22 @@
 const mongoose = require("mongoose");
+const taskSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: [true, "Please providea title"],
+  },
+  description: {
+    type: String,
+    required: [true, "Please provide a short description"],
+  },
+  status: {
+    type: String,
+    enum: ["Todo", "Doing", "Done"],
+    required: false,
+    default: "Todo",
+  },
+});
+
+const Task = mongoose.model("Task", taskSchema);
 
 const BoardSchema = new mongoose.Schema(
   {
@@ -9,8 +27,7 @@ const BoardSchema = new mongoose.Schema(
       maxLength: [20, "name cannot be more than 20 character"],
     },
     tasks: {
-      type: Array,
-      default: false,
+      type: [taskSchema],
     },
     createdBy: {
       type: mongoose.Types.ObjectId,
@@ -21,4 +38,6 @@ const BoardSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Board", BoardSchema);
+const Board = mongoose.model("Board", BoardSchema);
+
+module.exports = { Board, Task };
