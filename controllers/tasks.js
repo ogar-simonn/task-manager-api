@@ -32,6 +32,7 @@ const addTask = asyncWrapper(async (req, res, next) => {
     },
     { new: true, runValidators: true }
   );
+
   res.status(StatusCodes.CREATED).json({ tasks });
 });
 const deleteTask = asyncWrapper(async (req, res, next) => {
