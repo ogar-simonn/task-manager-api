@@ -8,6 +8,10 @@ const taskSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a short description"],
   },
+  subtasks: {
+    type: Array,
+    required: [true, "Please Provide subtasks"],
+  },
   status: {
     type: String,
     enum: ["Todo", "Doing", "Done"],
