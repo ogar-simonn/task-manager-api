@@ -13,7 +13,6 @@ const cors = require("cors");
 const xss = require("xss-clean");
 const rateLimiter = require("express-rate-limit");
 
-// app.use(cors());
 app.set("trust proxy", 1);
 app.use(
   rateLimiter({
@@ -21,11 +20,7 @@ app.use(
     max: 100, // limit each IP to 100 requests per windowMs
   })
 );
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors());
 app.use(express.json());
 app.use(helmet());
 app.use(xss());
