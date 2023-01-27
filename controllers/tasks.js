@@ -67,7 +67,10 @@ const updateTask = asyncWrapper(async (req, res, next) => {
     { createdBy: userId, _id: boardId, "tasks._id": taskId },
     { $set: { "tasks.$": newTask } }
   );
-  res.status(StatusCodes.CREATED).json({ tasks });
+  if (tasks) {
+    return res.status(StatusCodes.CREATED).json({ newTask });
+  }
+  res.status(StatusCodes.NOT_FOUND).json({ msg: "No Task found" });
 });
 
 module.exports = {
