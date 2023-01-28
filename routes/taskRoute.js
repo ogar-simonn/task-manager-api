@@ -8,7 +8,7 @@ const {
   updateTask,
 } = require("../controllers/tasks");
 
-router.get("/", getAllTasks);
+router.get("/:id", getAllTasks);
 router.post("/:id", addTask);
 router.delete("/:id/:taskId", deleteTask);
 router.patch("/:id/:taskId", updateTask);

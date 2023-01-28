@@ -4,8 +4,11 @@ const { createCustomError } = require("../errors/custom-error");
 const { StatusCodes } = require("http-status-codes");
 
 const getAllTasks = asyncWrapper(async (req, res, next) => {
-  const { userId } = req.user;
-  const tasks = await Board.find({ createdBy: userId });
+  const {
+    user: { userId },
+    params: { id: boardId },
+  } = req;
+  const tasks = await Board.find({ createdBy: userId, _id: boardId });
   if (!tasks) {
     return res.status(StatusCodes.NOT_FOUND).json({ msg: "No task Found" });
   }
